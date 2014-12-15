@@ -49,3 +49,51 @@ criteria.add(Restrictions.sqlRestriction(" {alias}.sms_accept is null
 <script src="../../util/jsAndCss/div.js" type=text/javascript></script>
 <link href="../../util/jsAndCss/div.css" rel="stylesheet" type="text/css">
 <div class="dragCss" style="width:600px; height:80px;overflow-y:scroll;">${rs.content}</div>//class是必须为dragCss
+
+
+利用gora框架获取数据库某个表对象以及数据
+以下代码需要gora-core-0.2.1.jar和hadoop-core-1.0.3.jar，配置文件gora-sql-mapping.xml和对象类WebPage
+	try
+	{
+		Configuration conff = new Configuration();
+	    conff.setInt("gora.buffer.write.limit", 1);//表示达到多少数量后向数据库更新一次数据
+		DataStore<String, WebPage> store4;
+		//store4 = StorageUtils.createWebStore(conff,String.class, WebPage.class);
+		store4 = DataStoreFactory.createDataStore((Class<? extends DataStore<K, V>>)Class.forName("org.apache.gora.sql.store.SqlStore")
+		,String.class, WebPage.class, conff, "webpage");
+		/*
+		org.apache.gora.sql.store.SqlStore为gora包内的工具类，还有如下选择：
+		org.apache.gora.sql.store.SqlStore 
+			Default store. A DataStore implementation for RDBMS with a SQL interface.
+			SqlStore uses JDBC drivers to communicate with the DB.
+		  
+		  org.apache.gora.cassandra.store.CassandraStore
+			Gora class for storing data in Apache Cassandra.
+		  
+		  org.apache.gora.hbase.store.HBaseStore
+			Gora class for storing data in Apache HBase.
+		  
+		  org.apache.gora.hbase.store.AccumuloStore
+			Gora class for storing data in Apache Accumulo.
+		  
+		  org.apache.gora.hbase.store.AvroStore
+			Gora class for storing data in Apache Avro.
+			
+		  org.apache.gora.hbase.store.DataFileAvroStore
+			Gora class for storing data in Apache Avro. DataFileAvroStore is 
+			a file based store which uses Avro's DataFile{Writer,Reader}'s as a backend.
+			This datastore supports mapreduce.
+			
+		  org.apache.gora.hbase.store.MemStore
+			Gora class for storing data in a Memory based implementation for tests.
+		*/
+		TaskAttemptContext contextt = new TaskAttemptContext(conff, new TaskAttemptID());
+		GoraRecordWriter grw = new GoraRecordWriter(store4, contextt);grw是目标对象
+		String key = "id";
+		WebPage page = new WebPage();
+		grw.write(key,page);//插入一条数据，以key为id
+	}
+	catch (ClassNotFoundException e)
+	{
+		e.printStackTrace();
+	}
