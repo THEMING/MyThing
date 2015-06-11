@@ -4,3 +4,4 @@ BCompare 文件对比
 Cygwin Windows系统模拟linux环境
 SecureCRT ssh连接工具
 tortoisegit Windows易化git的使用工具
+ApexSQL Log 2014  sqlserver根据提交日志进行数据回滚工具，试用版只能回滚大概2小时内的数据
